@@ -1,0 +1,216 @@
+:root {
+  --primary: #00e5ff;
+  --accent: #4fc3f7;
+  --highlight: #ffeb3b;
+  --bg: #121212;
+  --text: white;
+  --success: #00e676;
+  --danger: #ff5252;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+
+.ds-container {
+  background: var(--bg);
+  color: var(--text);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 1000px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+  transition: all 0.3s ease-in-out;
+}
+
+
+.ds-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.ds-controls input,
+.ds-controls select {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+}
+
+.ds-controls button {
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 5px;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.ds-controls button:hover {
+  background: var(--primary);
+}
+
+
+.highlight {
+  background: var(--highlight) !important;
+  animation: pulse 0.6s infinite alternate;
+}
+
+.found {
+  background: var(--success) !important;
+}
+
+.not-found {
+  background: var(--danger) !important;
+}
+
+
+.complexity-box {
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--primary);
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+
+@keyframes drawArrow {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.arrow {
+  font-size: 1.5rem;
+  color: var(--primary);
+  animation: drawArrow 0.4s ease-in-out;
+}
+
+
+.tree-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  overflow-x: auto;
+}
+
+.tree-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Tree node bubble */
+.tree-val {
+  background: var(--success, #4caf50);
+  color: black;
+  border-radius: 50%;
+  padding: 15px;
+  min-width: 40px;
+  text-align: center;
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
+}
+
+/* Child container */
+.tree-children {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  position: relative;
+  gap: 2rem;
+}
+
+/* Connector lines from parent to children */
+.tree-children::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 0;
+  height: 20px;
+  border-left: 2px solid var(--primary, #2196f3);
+  z-index: 0;
+}
+
+/* Connector line from parent to left child */
+.tree-children > .tree-node:first-child::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 25px;
+  height: 25px;
+  border-left: 2px solid var(--primary, #2196f3);
+  border-bottom: 2px solid var(--primary, #2196f3);
+  transform: translate(-100%, 0) rotate(45deg);
+}
+
+/* Connector line from parent to right child */
+.tree-children > .tree-node:last-child::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 25px;
+  height: 25px;
+  border-right: 2px solid var(--primary, #2196f3);
+  border-bottom: 2px solid var(--primary, #2196f3);
+  transform: translate(0, 0) rotate(-45deg);
+}
+
+/* Placeholder (empty child node) for consistent spacing */
+.tree-empty {
+  width: 40px;
+  height: 40px;
+}
+
+
+.educational-output {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--highlight);
+  text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
+}
