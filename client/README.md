@@ -1,3 +1,20 @@
+# 📊 DSA Visualizer
+
+This is a full-featured DSA Visualizer built using React (frontend), Node.js + Express (backend), and MongoDB. It includes visualizations for Sorting, Linked List, Stack, Queue, Tree, Graph, and Search algorithms.
+
+## 🌐 Live Demo
+
+- Frontend: [http://dsa-visualizer-njqr5r4pq-sonakshi-s-projects-71ebe145.vercel.app](http://dsa-visualizer-njqr5r4pq-sonakshi-s-projects-71ebe145.vercel.app)
+- Backend: [https://sorting-backend.onrender.com](https://sorting-backend.onrender.com)
+
+## 🚀 Features
+
+- Sorting Visualizer (Bubble, Merge, Quick, etc.)
+- Stack, Queue, Linked List
+- Tree and Graph visualizations
+- Educational mode, animations, pointer arrows
+- Authentication (JWT) + History saving (MongoDB)
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
