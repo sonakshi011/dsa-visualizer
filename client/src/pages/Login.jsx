@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch('https://sorting-backend-5ut1.onrender.com/api/auth/login', {
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, password: form.password }),
