@@ -1,4 +1,3 @@
-// Load environment variables first
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -12,37 +11,43 @@ import sessionRoutes from "./routes/sessions.js";
 const app = express();
 
 /* =====================
-   MIDDLEWARE (ORDER MATTERS)
+   🔴 CORS — MUST BE FIRST
 ===================== */
-
-// ✅ CORS FIX (THIS IS THE IMPORTANT PART)
-app.use(
-  cors({
-    origin: [
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
       "http://localhost:5173",
       "http://localhost:5174",
       "https://dsa-visualizer-eta.vercel.app"
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-  })
-);
+    ];
 
-// ✅ Handle preflight requests explicitly
-app.options("*", cors());
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+};
 
-// ✅ Parse JSON bodies
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // 🔴 PRE-FLIGHT FIX
+
+/* =====================
+   BODY PARSER
+===================== */
 app.use(express.json());
 
 /* =====================
    ENV CHECK
 ===================== */
 if (!process.env.JWT_SECRET) {
-  console.error("❌ JWT_SECRET is missing");
+  console.error("❌ JWT_SECRET missing");
   process.exit(1);
 } else {
-  console.log("✅ JWT_SECRET loaded successfully");
+  console.log("✅ JWT_SECRET loaded");
 }
 
 /* =====================
@@ -51,13 +56,12 @@ if (!process.env.JWT_SECRET) {
 app.use("/api/auth", authRoutes);
 app.use("/api/sessions", sessionRoutes);
 
-// Health check
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
 /* =====================
-   DATABASE + SERVER
+   DB + SERVER
 ===================== */
 const PORT = process.env.PORT || 10000;
 
@@ -70,6 +74,6 @@ mongoose
     });
   })
   .catch((err) => {
-    console.error("❌ MongoDB connection error:", err.message);
+    console.error("❌ MongoDB error:", err.message);
     process.exit(1);
   });
