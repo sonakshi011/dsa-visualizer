@@ -1,58 +1,69 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 export default function Login() {
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  });
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Update form state on input change
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("LOGIN SUBMIT TRIGGERED");
+    console.log("BASE_URL:", BASE_URL);
+    console.log("FORM DATA:", form);
+
+    if (!form.email || !form.password) {
+      alert("Email and password are required");
+      return;
+    }
+
     try {
       const res = await fetch(`${BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, password: form.password }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
       });
 
       const data = await res.json();
 
-      if (res.ok) {
-        // On success, save user and token in context/localStorage
-        login(data.user, data.token);
-        // Redirect to the sorting visualizer homepage (protected route)
-        navigate('/');
-      } else {
-        // Show error message from backend
-        alert(data.msg || 'Login failed. Please check your credentials.');
+      if (!res.ok) {
+        alert(data.error || "Login failed");
+        return;
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('An error occurred during login. Please try again.');
+
+      login(data.user, data.token);
+      navigate("/");
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
+      alert("An error occurred during login. Please try again.");
     }
   };
 
   return (
-    <div className="auth-container">
+    <div>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
 
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
           name="email"
           placeholder="Email"
           value={form.email}
           onChange={handleChange}
-          required
         />
 
         <input
@@ -61,7 +72,6 @@ export default function Login() {
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
-          required
         />
 
         <button type="submit">Login</button>

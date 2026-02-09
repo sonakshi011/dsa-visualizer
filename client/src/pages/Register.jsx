@@ -1,59 +1,88 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 export default function Register() {
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: ""
+  });
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(`${BASE_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (res.ok) {
+
+    console.log("REGISTER SUBMIT TRIGGERED");
+    console.log("BASE_URL:", BASE_URL);
+    console.log("FORM DATA:", form);
+
+    if (!form.username || !form.email || !form.password) {
+      alert("All fields are required");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Registration failed");
+        return;
+      }
+
       login(data.user, data.token);
-      navigate('/'); // successful redirect!
-    } else {
-      alert(data.msg || 'Registration failed');
+      navigate("/");
+    } catch (err) {
+      console.error("REGISTER ERROR:", err);
+      alert("Something went wrong during registration");
     }
   };
 
   return (
-    <div className="auth-container">
+    <div>
       <h2>Register</h2>
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Username"
           name="username"
+          placeholder="Username"
           value={form.username}
           onChange={handleChange}
-          required
         />
+
         <input
           type="email"
-          placeholder="Email"
           name="email"
+          placeholder="Email"
           value={form.email}
           onChange={handleChange}
-          required
         />
+
         <input
           type="password"
-          placeholder="Password"
           name="password"
+          placeholder="Password"
           value={form.password}
           onChange={handleChange}
-          required
         />
+
         <button type="submit">Register</button>
       </form>
     </div>
