@@ -11,29 +11,22 @@ import sessionRoutes from "./routes/sessions.js";
 const app = express();
 
 /* =====================
-   🔴 CORS — MUST BE FIRST
+   ✅ SIMPLE & SAFE CORS
 ===================== */
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
+app.use(
+  cors({
+    origin: [
       "http://localhost:5173",
       "http://localhost:5174",
       "https://dsa-visualizer-eta.vercel.app"
-    ];
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
 
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // 🔴 PRE-FLIGHT FIX
+// ✅ Handle preflight explicitly
+app.options("*", cors());
 
 /* =====================
    BODY PARSER
