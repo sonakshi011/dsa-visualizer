@@ -1,42 +1,46 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-dotenv.config();
-
-// Get the JWT secret from environment variables
-const JWT_SECRET = process.env.JWT_SECRET;
-
-// Check if JWT_SECRET is loaded correctly
-if (!JWT_SECRET) {
-  console.error("❌ JWT_SECRET is not defined. Please check your .env file.");
-}
-
-// =======================
-// Register Controller
-// =======================
+/* =======================
+   REGISTER CONTROLLER
+======================= */
 export const register = async (req, res) => {
+  console.log("🔥 REGISTER HIT:", req.body);
+
   const { username, email, password } = req.body;
 
+  // ✅ 1. Validate input (VERY IMPORTANT)
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
   try {
+    // ✅ 2. Check existing user
     const existing = await User.findOne({ email });
     if (existing) {
-      return res.status(400).json({ msg: 'User already exists' });
+      return res.status(400).json({ error: "User already exists" });
     }
 
+    // ✅ 3. Hash password
     const hash = await bcrypt.hash(password, 10);
 
+    // ✅ 4. Create user
     const user = await User.create({
       username,
       email,
       password: hash
     });
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '2d' });
+    // ✅ 5. Generate JWT
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "2d" }
+    );
 
-    res.status(201).json({
+    // ✅ 6. Send correct response
+    return res.status(201).json({
       token,
       user: {
         id: user._id,
@@ -45,29 +49,46 @@ export const register = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("❌ Registration Error:", err.message);
-    res.status(500).json({ msg: err.message });
+    console.error("❌ Registration Error:", err);
+    return res.status(500).json({ error: "Server error during registration" });
   }
 };
 
-// =======================
-// Login Controller
-// =======================
+/* =======================
+   LOGIN CONTROLLER
+======================= */
 export const login = async (req, res) => {
+  console.log("🔥 LOGIN HIT:", req.body);
+
   const { email, password } = req.body;
 
+  // ✅ 1. Validate input
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" });
+  }
+
   try {
+    // ✅ 2. Find user
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ msg: 'User not found' });
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
 
+    // ✅ 3. Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ msg: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '2d' });
+    // ✅ 4. Generate JWT
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "2d" }
+    );
 
-    res.json({
+    // ✅ 5. Send response
+    return res.json({
       token,
       user: {
         id: user._id,
@@ -76,7 +97,7 @@ export const login = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("❌ Login Error:", err.message);
-    res.status(500).json({ msg: err.message });
+    console.error("❌ Login Error:", err);
+    return res.status(500).json({ error: "Server error during login" });
   }
 };

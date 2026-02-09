@@ -1,4 +1,4 @@
-// Load environment variables first!
+// Load environment variables first
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -11,29 +11,49 @@ import sessionRoutes from './routes/sessions.js';
 
 const app = express();
 
-// Middleware
-app.use(cors());
+/* =====================
+   MIDDLEWARE (ORDER MATTERS)
+===================== */
+app.use(cors({
+  origin: 'https://dsa-visualizer-eta.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 app.use(express.json());
 
-// Check for JWT_SECRET
+/* =====================
+   ENV CHECK
+===================== */
 if (!process.env.JWT_SECRET) {
-  console.error("❌ JWT_SECRET is missing in your environment variables");
-  process.exit(1); // stop the server if critical env variable is missing
+  console.error('❌ JWT_SECRET is missing');
+  process.exit(1);
 } else {
-  console.log("✅ JWT_SECRET loaded successfully");
+  console.log('✅ JWT_SECRET loaded successfully');
 }
 
-// Routes
+/* =====================
+   ROUTES
+===================== */
 app.use('/api/auth', authRoutes);
 app.use('/api/sessions', sessionRoutes);
 
-// MongoDB connection
+// Health check (VERY IMPORTANT for Render & debugging)
+app.get('/', (req, res) => {
+  res.send('Backend is running');
+});
+
+/* =====================
+   DATABASE + SERVER
+===================== */
+const PORT = process.env.PORT; // 🔴 do NOT fallback to 5000 on Render
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
-    app.listen(process.env.PORT || 5000, () =>
-      console.log(`🚀 Server running on port ${process.env.PORT || 5000}`)
-    );
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
   })
   .catch(err => {
     console.error('❌ MongoDB connection error:', err.message);
